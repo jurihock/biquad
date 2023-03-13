@@ -9,13 +9,15 @@ class lowpass(biquad):
     Lowpass filter (LPF).
     """
 
-    def __init__(self, sr):
+    def __init__(self, sr, q=0.7071):
 
         super().__init__(sr)
 
-        self.__call__(0, 1, 2) # warmup numba
+        self.q = q
 
-    def __call__(self, x, f, q=0.7071):
+        self.__call__(0, 1) # warmup numba
+
+    def __call__(self, x, f, q=None):
         """
         Process single or multiple samples at once.
         """
@@ -29,7 +31,7 @@ class lowpass(biquad):
         y = numpy.zeros(x.shape)
 
         f = numpy.atleast_1d(f)
-        q = numpy.atleast_1d(q)
+        q = numpy.atleast_1d(q or self.q)
 
         f = numpy.resize(f, x.shape)
         q = numpy.resize(q, x.shape)

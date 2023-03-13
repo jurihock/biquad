@@ -9,16 +9,18 @@ class bandpass(biquad):
     Bandpass filter (BPF).
     """
 
-    def __init__(self, sr, gain='skirt'):
+    def __init__(self, sr, gain='skirt', q=0.7071):
 
         super().__init__(sr)
 
         assert gain in ['skirt', 'peak']
+
         self.gain = gain
+        self.q = q
 
-        self.__call__(0, 1, 2) # warmup numba
+        self.__call__(0, 1) # warmup numba
 
-    def __call__(self, x, f, q=0.7071):
+    def __call__(self, x, f, q=None):
         """
         Process single or multiple samples at once.
         """
@@ -32,7 +34,7 @@ class bandpass(biquad):
         y = numpy.zeros(x.shape)
 
         f = numpy.atleast_1d(f)
-        q = numpy.atleast_1d(q)
+        q = numpy.atleast_1d(q or self.q)
 
         f = numpy.resize(f, x.shape)
         q = numpy.resize(q, x.shape)
