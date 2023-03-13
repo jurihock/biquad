@@ -1,30 +1,6 @@
 import numpy
 
 
-def __response__(b, a, sr, norm=False, log=False):
-
-    n = int(sr / 2)
-
-    # compute frequencies from 0 to pi or sr/2 but excluding the Nyquist frequency
-    w = numpy.linspace(0, numpy.pi, n, endpoint=False) \
-        if not log else \
-        numpy.logspace(numpy.log10(1), numpy.log10(numpy.pi), n, endpoint=False, base=10)
-
-    # compute the z-domain transfer function
-    z = numpy.exp(-1j * w)
-    x = numpy.polynomial.polynomial.polyval(z, a, tensor=False)
-    y = numpy.polynomial.polynomial.polyval(z, b, tensor=False)
-    h = y / x
-
-    # normalize frequency amplitudes
-    h /= len(h) if norm else 1
-
-    # normalize frequency values according to sr
-    w = (w * sr) / (2 * numpy.pi)
-
-    return w, h
-
-
 def __abs__(x, db=False):
 
     if db:
@@ -46,11 +22,10 @@ def __arg__(x, wrap=None):
 
 class plot:
 
-    def __init__(self, b, a, sr):
+    def __init__(self, w, h):
 
-        self.b = b
-        self.a = a
-        self.sr = sr
+        self.w = w
+        self.h = h
 
     def frequency(self, xlim=None, ylim=None):
 
@@ -72,12 +47,7 @@ class plot:
             else:
                 pyplot.ylim(-110, numpy.maximum(10, y.max()))
 
-        b  = self.b
-        a  = self.a
-        sr = self.sr
-
-        x, y = __response__(b, a, sr)
-        y    = __abs__(y, db=True)
+        x, y = self.w, __abs__(self.h, db=True)
 
         pyplot.plot(x, y)
         pyplot.xlabel('Hz')
@@ -107,12 +77,7 @@ class plot:
             else:
                 pyplot.ylim(-numpy.pi, +numpy.pi)
 
-        b  = self.b
-        a  = self.a
-        sr = self.sr
-
-        x, y = __response__(b, a, sr)
-        y    = __arg__(y, wrap=True)
+        x, y = self.w, __arg__(self.h, wrap=True)
 
         pyplot.plot(x, y)
         pyplot.xlabel('Hz')

@@ -19,13 +19,6 @@ class biquad:
 
         self.sr = sr
 
-    def plot(self):
-
-        b, a = self.ba
-        sr   = self.sr
-
-        return plot(b, a, sr)
-
     def __call__(self, x, *args, **kwargs):
         """
         Process single or multiple samples at once.
@@ -66,3 +59,34 @@ class biquad:
                         ba[1, 2] * xy[1, 2]) / ba[1, 0]
 
             y[i] = xy[1, 0]
+
+    def response(self, norm=False, log=False):
+
+        (b, a), sr = self.ba, self.sr
+
+        n = int(sr / 2)
+
+        # compute frequencies from 0 to pi or sr/2 but excluding the Nyquist frequency
+        w = numpy.linspace(0, numpy.pi, n, endpoint=False) \
+            if not log else \
+            numpy.logspace(numpy.log10(1), numpy.log10(numpy.pi), n, endpoint=False, base=10)
+
+        # compute the z-domain transfer function
+        z = numpy.exp(-1j * w)
+        x = numpy.polynomial.polynomial.polyval(z, a, tensor=False)
+        y = numpy.polynomial.polynomial.polyval(z, b, tensor=False)
+        h = y / x
+
+        # normalize frequency amplitudes
+        h /= len(h) if norm else 1
+
+        # normalize frequency values according to sr
+        w = (w * sr) / (2 * numpy.pi)
+
+        return w, h
+
+    def plot(self):
+
+        w, h = self.response()
+
+        return plot(w, h)
