@@ -8,12 +8,10 @@ class biquad:
     """
 
     # filter coeffs
-    b = numpy.array([1., 0., 0.])
-    a = numpy.array([1., 0., 0.])
+    ba = numpy.array([[1, 0, 0], [1, 0, 0]], float)
 
     # delay line
-    x = numpy.array([0., 0., 0.])
-    y = numpy.array([0., 0., 0.])
+    xy = numpy.array([[0, 0, 0], [0, 0, 0]], float)
 
     def __call__(self, x):
         """
@@ -22,8 +20,8 @@ class biquad:
 
         scalar = numpy.isscalar(x)
 
-        ba = numpy.array([self.b, self.a])
-        xy = numpy.array([self.x, self.y])
+        ba = self.ba
+        xy = self.xy
 
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape)
@@ -75,8 +73,8 @@ class bandpass(biquad):
 
         scalar = numpy.isscalar(x)
 
-        ba = numpy.array([self.b, self.a])
-        xy = numpy.array([self.x, self.y])
+        ba = self.ba
+        xy = self.xy
 
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape)
