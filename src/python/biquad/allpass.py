@@ -4,21 +4,18 @@ import numba
 import numpy
 
 
-class bandpass(biquad):
+class allpass(biquad):
     """
-    Bandpass filter (BPF).
+    Allpass filter (APF).
     """
 
-    def __init__(self, sr, gain='skirt'):
-
-        assert gain in ['skirt', 'peak']
+    def __init__(self, sr):
 
         self.sr = sr
-        self.gain = gain
 
         self.__call__(0, 1, 2) # warmup numba
 
-    def __call__(self, x, f, bw):
+    def __call__(self, x, f, q):
         """
         Process single or multiple samples at once.
         """
@@ -32,25 +29,22 @@ class bandpass(biquad):
         y = numpy.zeros(x.shape)
 
         f = numpy.atleast_1d(f)
-        bw = numpy.atleast_1d(bw)
+        q = numpy.atleast_1d(q)
 
         f = numpy.resize(f, x.shape)
-        bw = numpy.resize(bw, x.shape)
+        q = numpy.resize(q, x.shape)
 
         sr = self.sr
-        gain = self.gain
 
-        self.__filter__(ba, xy, x, y, f, bw, sr, gain)
+        self.__filter__(ba, xy, x, y, f, q, sr)
 
         return y[0] if scalar else y
 
     @staticmethod
     @numba.jit(nopython=True, fastmath=True)
-    def __filter__(ba, xy, x, y, f, bw, sr, gain):
+    def __filter__(ba, xy, x, y, f, q, sr):
 
-        ln = numpy.log(2) / 2
         rs = 2 * numpy.pi / sr
-        skirt = gain == 'skirt'
 
         for i in range(x.size):
 
@@ -59,18 +53,17 @@ class bandpass(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
-            p = sinw * numpy.sinh(ln * bw[i] * w / sinw)
-            g = sinw / 2 if skirt else p
+            p = sinw / (2 * q[i])
 
             # update b
-            ba[0, 0] = +g
-            ba[0, 1] =  0
-            ba[0, 2] = -g
+            ba[0, 0] =  1 - p
+            ba[0, 1] = -2 * cosw
+            ba[0, 2] =  1 + p
 
             # update a
-            ba[1, 0] =  1 + p
-            ba[1, 1] = -2 * cosw
-            ba[1, 2] =  1 - p
+            ba[1, 0] = ba[0, 2]
+            ba[1, 1] = ba[0, 1]
+            ba[1, 2] = ba[0, 0]
 
             # roll x
             xy[0, 2] = xy[0, 1]
