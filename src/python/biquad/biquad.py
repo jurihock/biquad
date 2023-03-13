@@ -15,10 +15,14 @@ class biquad:
     # delay line
     xy = numpy.array([[0, 0, 0], [0, 0, 0]], float)
 
+    def __init__(self, sr):
+
+        self.sr = sr
+
     def plot(self):
 
         b, a = self.ba
-        sr = 44100
+        sr   = self.sr
 
         return plot(b, a, sr)
 

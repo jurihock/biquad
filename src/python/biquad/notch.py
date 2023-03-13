@@ -11,7 +11,7 @@ class notch(biquad):
 
     def __init__(self, sr):
 
-        self.sr = sr
+        super().__init__(sr)
 
         self.__call__(0, 1, 2) # warmup numba
 
