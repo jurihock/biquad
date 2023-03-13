@@ -18,7 +18,7 @@ class bandpass(biquad):
 
         self.__call__(0, 1, 2) # warmup numba
 
-    def __call__(self, x, f, bw):
+    def __call__(self, x, f, q=numpy.sqrt(2)/2):
         """
         Process single or multiple samples at once.
         """
@@ -32,23 +32,22 @@ class bandpass(biquad):
         y = numpy.zeros(x.shape)
 
         f = numpy.atleast_1d(f)
-        bw = numpy.atleast_1d(bw)
+        q = numpy.atleast_1d(q)
 
         f = numpy.resize(f, x.shape)
-        bw = numpy.resize(bw, x.shape)
+        q = numpy.resize(q, x.shape)
 
         sr = self.sr
         gain = self.gain
 
-        self.__filter__(ba, xy, x, y, f, bw, sr, gain)
+        self.__filter__(ba, xy, x, y, f, q, sr, gain)
 
         return y[0] if scalar else y
 
     @staticmethod
     @numba.jit(nopython=True, fastmath=True)
-    def __filter__(ba, xy, x, y, f, bw, sr, gain):
+    def __filter__(ba, xy, x, y, f, q, sr, gain):
 
-        ln = numpy.log(2) / 2
         rs = 2 * numpy.pi / sr
         skirt = gain == 'skirt'
 
@@ -59,7 +58,7 @@ class bandpass(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
-            p = sinw * numpy.sinh(ln * bw[i] * w / sinw)
+            p = sinw / (2 * q[i])
             g = sinw / 2 if skirt else p
 
             # update b
