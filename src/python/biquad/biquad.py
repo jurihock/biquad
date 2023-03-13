@@ -26,7 +26,7 @@ class biquad:
 
         return plot(b, a, sr)
 
-    def __call__(self, x):
+    def __call__(self, x, *args, **kwargs):
         """
         Process single or multiple samples at once.
         """
