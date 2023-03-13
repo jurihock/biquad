@@ -6,12 +6,15 @@ import numpy
 
 class bandpass(biquad):
     """
-    BPF (constant 0 dB peak gain)
+    Bandpass filter (BPF).
     """
 
-    def __init__(self, sr):
+    def __init__(self, sr, gain='skirt'):
+
+        assert gain in ['skirt', 'peak']
 
         self.sr = sr
+        self.gain = gain
 
         self.__call__(0, 1, 2) # warmup numba
 
@@ -35,17 +38,19 @@ class bandpass(biquad):
         bw = numpy.resize(bw, x.shape)
 
         sr = self.sr
+        gain = self.gain
 
-        self.__filter__(ba, xy, x, y, f, bw, sr)
+        self.__filter__(ba, xy, x, y, f, bw, sr, gain)
 
         return y[0] if scalar else y
 
     @staticmethod
     @numba.jit(nopython=True, fastmath=True)
-    def __filter__(ba, xy, x, y, f, bw, sr):
+    def __filter__(ba, xy, x, y, f, bw, sr, gain):
 
-        rs = 2 * numpy.pi / sr
         ln = numpy.log(2) / 2
+        rs = 2 * numpy.pi / sr
+        skirt = gain == 'skirt'
 
         for i in range(x.size):
 
@@ -55,11 +60,12 @@ class bandpass(biquad):
             sinw = numpy.sin(w)
 
             p = sinw * numpy.sinh(bw[i] * ln * w / sinw)
+            g = sinw / 2 if skirt else p
 
             # update b
-            ba[0, 0] = +p
+            ba[0, 0] = +g
             ba[0, 1] =  0
-            ba[0, 2] = -p
+            ba[0, 2] = -g
 
             # update a
             ba[1, 0] =  1 + p
