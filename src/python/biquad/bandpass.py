@@ -11,12 +11,11 @@ class bandpass(biquad):
 
     def __init__(self, sr, gain='skirt', q=0.7071):
 
-        super().__init__(sr)
+        super().__init__(sr, q)
 
         assert gain in ['skirt', 'peak']
 
         self.gain = gain
-        self.q = q
 
         self.__call__(0, 1) # warmup numba
 

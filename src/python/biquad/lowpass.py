@@ -11,9 +11,7 @@ class lowpass(biquad):
 
     def __init__(self, sr, q=0.7071):
 
-        super().__init__(sr)
-
-        self.q = q
+        super().__init__(sr, q)
 
         self.__call__(0, 1) # warmup numba
 

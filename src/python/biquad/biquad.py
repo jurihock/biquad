@@ -15,9 +15,13 @@ class biquad:
     # delay line
     xy = numpy.array([[0, 0, 0], [0, 0, 0]], float)
 
-    def __init__(self, sr):
+    def __init__(self, sr, q=None):
+
+        assert (sr is not None) and (numpy.isscalar(sr) and numpy.isreal(sr))
+        assert (q  is     None) or  (numpy.isscalar(q)  and numpy.isreal(q))
 
         self.sr = sr
+        self.q  = q
 
     def __call__(self, x, *args, **kwargs):
         """
