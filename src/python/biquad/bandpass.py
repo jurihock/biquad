@@ -18,7 +18,7 @@ class bandpass(biquad):
 
         self.__call__(0, 1, 2) # warmup numba
 
-    def __call__(self, x, f, q=numpy.sqrt(2)/2):
+    def __call__(self, x, f, q=0.7071):
         """
         Process single or multiple samples at once.
         """
