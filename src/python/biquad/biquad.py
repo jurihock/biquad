@@ -1,3 +1,5 @@
+from .plot import plot
+
 import numba
 import numpy
 
@@ -12,6 +14,13 @@ class biquad:
 
     # delay line
     xy = numpy.array([[0, 0, 0], [0, 0, 0]], float)
+
+    def plot(self):
+
+        b, a = self.ba
+        sr = 44100
+
+        return plot(b, a, sr)
 
     def __call__(self, x):
         """
