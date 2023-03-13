@@ -15,7 +15,7 @@ class lowpass(biquad):
 
         self.__call__(0, 1, 2) # warmup numba
 
-    def __call__(self, x, f, q):
+    def __call__(self, x, f, q=numpy.sqrt(2)/2):
         """
         Process single or multiple samples at once.
         """
