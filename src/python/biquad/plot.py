@@ -1,3 +1,11 @@
+"""
+Copyright (c) 2023 Juergen Hock
+
+SPDX-License-Identifier: MIT
+
+Source: https://github.com/jurihock/biquad
+"""
+
 import numpy
 
 
