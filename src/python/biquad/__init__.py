@@ -7,6 +7,7 @@ from .biquad   import biquad
 from .highpass import highpass
 from .lowpass  import lowpass
 from .notch    import notch
+from .peak     import peak
 
 
 def filter(name, sr, **kwargs):
@@ -27,5 +28,8 @@ def filter(name, sr, **kwargs):
 
     if name in ['notch', 'nf']:
         return notch(sr, **kwargs)
+
+    if name in ['peak', 'pf']:
+        return peak(sr, **kwargs)
 
     return biquad(sr, **kwargs)

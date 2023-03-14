@@ -14,6 +14,7 @@ filters = [
     'hpf',
     'lpf',
     'notch',
+    'peak',
 ]
 
 for name in filters:
