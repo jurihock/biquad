@@ -17,7 +17,21 @@ class notch(biquad):
 
     def __call__(self, x, f, q=None):
         """
-        Process single or multiple samples at once.
+        Process single or multiple contiguous signal values at once.
+
+        Parameters
+        ----------
+        x : scalar or array like
+            Filter input data.
+        f : scalar or array like
+            Instantaneous filter frequency parameter in hertz.
+        q : scalar or array like, optional
+            Optional instantaneous filter quality parameter.
+
+        Returns
+        -------
+        y : scalar or ndarray
+            Filter output data of the same shape and dtype as the input x.
         """
 
         scalar = numpy.isscalar(x)

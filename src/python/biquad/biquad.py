@@ -6,6 +6,11 @@ import numpy
 
 @numba.jit(nopython=True, fastmath=True)
 def __df1__(ba, xy, x, y, i):
+    """
+    Computes filter output y[i] based on filter input x[i]
+    as well as specified filter coeffs ba and delay line xy,
+    according to the Direct Form 1.
+    """
 
     # roll x
     xy[0, 2] = xy[0, 1]
@@ -34,11 +39,19 @@ class biquad:
     Biquad filter base class.
     """
 
-    # filter coeffs
     ba = numpy.array([[1, 0, 0], [1, 0, 0]], float)
+    """
+    Biquad filter coefficient matrix of shape (2, 3):
+        - ba[0] holds b coefficients
+        - ba[1] holds a coefficients
+    """
 
-    # delay line
     xy = numpy.array([[0, 0, 0], [0, 0, 0]], float)
+    """
+    Biquad filter delay line matrix of shape (2, 3):
+        - xy[0] holds input values
+        - xy[0] holds output values
+    """
 
     def __init__(self, sr, q=None):
 
@@ -57,7 +70,17 @@ class biquad:
 
     def __call__(self, x, *args, **kwargs):
         """
-        Process single or multiple samples at once.
+        Process single or multiple contiguous signal values at once.
+
+        Parameters
+        ----------
+        x : scalar or array like
+            Filter input data.
+
+        Returns
+        -------
+        y : scalar or ndarray
+            Filter output data of the same shape and dtype as the input x.
         """
 
         scalar = numpy.isscalar(x)
