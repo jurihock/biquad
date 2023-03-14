@@ -1,4 +1,4 @@
-from .biquad import biquad
+from .biquad import biquad, __df1__
 
 import numba
 import numpy
@@ -29,7 +29,7 @@ class peak(biquad):
         xy = self.xy
 
         x = numpy.atleast_1d(x)
-        y = numpy.zeros(x.shape)
+        y = numpy.zeros(x.shape, x.dtype)
 
         f = numpy.atleast_1d(f)
         q = numpy.atleast_1d(q or self.q)
@@ -73,20 +73,5 @@ class peak(biquad):
             ba[1, 1] =     c
             ba[1, 2] = 1 - d
 
-            # roll x
-            xy[0, 2] = xy[0, 1]
-            xy[0, 1] = xy[0, 0]
-
-            # roll y
-            xy[1, 2] = xy[1, 1]
-            xy[1, 1] = xy[1, 0]
-
-            # update x and y
-            xy[0, 0] = x[i]
-            xy[1, 0] = (ba[0, 0] * xy[0, 0]  + \
-                        ba[0, 1] * xy[0, 1]  + \
-                        ba[0, 2] * xy[0, 2]  - \
-                        ba[1, 1] * xy[1, 1]  - \
-                        ba[1, 2] * xy[1, 2]) / ba[1, 0]
-
-            y[i] = xy[1, 0]
+            # update y
+            __df1__(ba, xy, x, y, i)

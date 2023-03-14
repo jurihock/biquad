@@ -4,6 +4,31 @@ import numba
 import numpy
 
 
+@numba.jit(nopython=True, fastmath=True)
+def __df1__(ba, xy, x, y, i):
+
+    # roll x
+    xy[0, 2] = xy[0, 1]
+    xy[0, 1] = xy[0, 0]
+
+    # roll y
+    xy[1, 2] = xy[1, 1]
+    xy[1, 1] = xy[1, 0]
+
+    # update x
+    xy[0, 0] = x[i]
+
+    # update y
+    xy[1, 0] = (ba[0, 0] * xy[0, 0]  + \
+                ba[0, 1] * xy[0, 1]  + \
+                ba[0, 2] * xy[0, 2]  - \
+                ba[1, 1] * xy[1, 1]  - \
+                ba[1, 2] * xy[1, 2]) / ba[1, 0]
+
+    # return y
+    y[i] = xy[1, 0]
+
+
 class biquad:
     """
     Biquad filter base class.
@@ -23,6 +48,13 @@ class biquad:
         self.sr = sr
         self.q  = q
 
+        # warmup numba
+        ba = self.ba
+        xy = self.xy
+        x = numpy.zeros(1, float)
+        y = numpy.zeros(x.shape, x.dtype)
+        __df1__(ba, xy, x, y, 0)
+
     def __call__(self, x, *args, **kwargs):
         """
         Process single or multiple samples at once.
@@ -34,7 +66,7 @@ class biquad:
         xy = self.xy
 
         x = numpy.atleast_1d(x)
-        y = numpy.zeros(x.shape)
+        y = numpy.zeros(x.shape, x.dtype)
 
         self.__filter__(ba, xy, x, y)
 
@@ -46,23 +78,7 @@ class biquad:
 
         for i in range(x.size):
 
-            # roll x
-            xy[0, 2] = xy[0, 1]
-            xy[0, 1] = xy[0, 0]
-
-            # roll y
-            xy[1, 2] = xy[1, 1]
-            xy[1, 1] = xy[1, 0]
-
-            # update x and y
-            xy[0, 0] = x[i]
-            xy[1, 0] = (ba[0, 0] * xy[0, 0]  + \
-                        ba[0, 1] * xy[0, 1]  + \
-                        ba[0, 2] * xy[0, 2]  - \
-                        ba[1, 1] * xy[1, 1]  - \
-                        ba[1, 2] * xy[1, 2]) / ba[1, 0]
-
-            y[i] = xy[1, 0]
+            __df1__(ba, xy, x, y, i)
 
     def response(self, norm=False, log=False):
 
