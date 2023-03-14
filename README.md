@@ -17,7 +17,7 @@ This is a collection of digital biquad filters whose parameters `f` (frequency) 
 
 ## Basic usage
 
-Filter with persistent configuration:
+Filter with static configuration:
 
 ```python
 import biquad
