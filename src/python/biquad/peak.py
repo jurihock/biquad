@@ -57,19 +57,20 @@ class peak(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
+            c = -(2 * cosw)
             p = sinw / (2 * q[i])
 
             m = p * amp
             d = p / amp
 
             # update b
-            ba[0, 0] =  1 + m
-            ba[0, 1] = -2 * cosw
-            ba[0, 2] =  1 - m
+            ba[0, 0] = 1 + m
+            ba[0, 1] =     c
+            ba[0, 2] = 1 - m
 
             # update a
             ba[1, 0] = 1 + d
-            ba[1, 1] = ba[0, 1]
+            ba[1, 1] =     c
             ba[1, 2] = 1 - d
 
             # roll x

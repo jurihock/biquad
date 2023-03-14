@@ -59,6 +59,7 @@ class bandpass(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
+            c = -(2 * cosw)
             p = sinw / (2 * q[i])
             g = sinw / 2 if skirt else p
 
@@ -68,9 +69,9 @@ class bandpass(biquad):
             ba[0, 2] = -g
 
             # update a
-            ba[1, 0] =  1 + p
-            ba[1, 1] = -2 * cosw
-            ba[1, 2] =  1 - p
+            ba[1, 0] = 1 + p
+            ba[1, 1] =     c
+            ba[1, 2] = 1 - p
 
             # roll x
             xy[0, 2] = xy[0, 1]

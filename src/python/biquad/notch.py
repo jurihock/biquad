@@ -53,17 +53,18 @@ class notch(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
+            c = -(2 * cosw)
             p = sinw / (2 * q[i])
 
             # update b
-            ba[0, 0] =  1
-            ba[0, 1] = -2 * cosw
-            ba[0, 2] =  1
+            ba[0, 0] = 1
+            ba[0, 1] = c
+            ba[0, 2] = 1
 
             # update a
-            ba[1, 0] = ba[0, 0] + p
-            ba[1, 1] = ba[0, 1]
-            ba[1, 2] = ba[0, 2] - p
+            ba[1, 0] = 1 + p
+            ba[1, 1] =     c
+            ba[1, 2] = 1 - p
 
             # roll x
             xy[0, 2] = xy[0, 1]
