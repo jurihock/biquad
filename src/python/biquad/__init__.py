@@ -13,6 +13,18 @@ from .peak      import peak
 
 
 def filter(name, sr, **kwargs):
+    """
+    Create a filter instance of the specified filter name.
+
+    Parameters
+    ----------
+    sr : int or float
+        Sample rate in hertz.
+    f : int or float, optional
+        Persistent filter frequency parameter in hertz.
+    q : int or float, optional
+        Persistent filter quality parameter.
+    """
 
     name = str(name).lower()
 
