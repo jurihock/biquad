@@ -53,6 +53,12 @@ myq = np.linspace(2,  1/2, len(x))
 y = f(x, f=myf, q=myq)
 ```
 
+Keep in mind:
+
+- All filters have a default value for the persistent parameter `q`, which is set in the particular `__init__` method.
+- The parameter `f` must be set either in the `__init__` or in the `__call__` method.
+- The optional instantaneous parameters `f` and `q`, if specified in the `__call__` method, override the persistent ones. 
+
 ## See also
 
 [Cookbook formulae for audio equalizer biquad filter coefficients](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html)
