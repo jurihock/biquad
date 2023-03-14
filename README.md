@@ -4,6 +4,17 @@
 ![license](https://img.shields.io/github/license/jurihock/biquad?color=green)
 ![pypi](https://img.shields.io/pypi/v/biquad?color=gold)
 
-This will be a collection of digital biquad filters whose parameters can be varied at runtime.
+This is a collection of digital biquad filters whose parameters can be varied at runtime containing:
 
-See also: [Cookbook formulae for audio equalizer biquad filter coefficients](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html)
+- Allpass
+- Bandpass
+- Highpass
+- Lowpass
+- Highshelf
+- Lowshelf
+- Notch
+- Peak
+
+## See also
+
+[Cookbook formulae for audio equalizer biquad filter coefficients](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html)
