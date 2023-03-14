@@ -4,7 +4,7 @@
 ![license](https://img.shields.io/github/license/jurihock/biquad?color=green)
 ![pypi](https://img.shields.io/pypi/v/biquad?color=gold)
 
-This is a collection of digital biquad filters whose parameters can be varied at runtime containing:
+This is a collection of digital biquad filters whose parameters `frequency` and `quality` can be varied at runtime. Following filter implementations are available:
 
 - Allpass
 - Bandpass
