@@ -9,7 +9,7 @@ class highshelf(biquad):
     Highshelf filter (HSF).
     """
 
-    def __init__(self, sr, gain=6, q=1):
+    def __init__(self, sr, gain=6, *, f=None, q=1):
         """
         Create a new filter instance.
 
@@ -19,18 +19,20 @@ class highshelf(biquad):
             Sample rate in hertz.
         gain : int or float, optional
             Filter peak gain value in decibel.
+        f : int or float, optional
+            Persistent filter frequency parameter in hertz.
         q : int or float, optional
             Persistent filter quality parameter.
         """
 
-        super().__init__(sr, q)
+        super().__init__(sr=sr, f=f, q=q)
 
         self.gain = gain
         self.amp = 10 ** (gain / 40)
 
         self.__call__(0, 1) # warmup numba
 
-    def __call__(self, x, f, q=None):
+    def __call__(self, x, f=None, q=None):
         """
         Process single or multiple contiguous signal values at once.
 
@@ -38,10 +40,10 @@ class highshelf(biquad):
         ----------
         x : scalar or array like
             Filter input data.
-        f : scalar or array like
+        f : scalar or array like, optional
             Instantaneous filter frequency parameter in hertz.
         q : scalar or array like, optional
-            Optional instantaneous filter quality parameter.
+            Instantaneous filter quality parameter.
 
         Returns
         -------
@@ -57,8 +59,8 @@ class highshelf(biquad):
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape, x.dtype)
 
-        f = numpy.atleast_1d(f)
-        q = numpy.atleast_1d(q or self.q)
+        f = numpy.atleast_1d(self.f if f is None else f)
+        q = numpy.atleast_1d(self.q if q is None else q)
 
         f = numpy.resize(f, x.shape)
         q = numpy.resize(q, x.shape)

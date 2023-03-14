@@ -53,7 +53,7 @@ class biquad:
         - xy[0] holds output values
     """
 
-    def __init__(self, sr, q=None):
+    def __init__(self, sr, *, f=None, q=None):
         """
         Create a new filter instance.
 
@@ -61,14 +61,18 @@ class biquad:
         ----------
         sr : int or float
             Sample rate in hertz.
+        f : int or float, optional
+            Persistent filter frequency parameter in hertz.
         q : int or float, optional
             Persistent filter quality parameter.
         """
 
         assert (sr is not None) and (numpy.isscalar(sr) and numpy.isreal(sr))
+        assert (f  is     None) or  (numpy.isscalar(f)  and numpy.isreal(f))
         assert (q  is     None) or  (numpy.isscalar(q)  and numpy.isreal(q))
 
         self.sr = sr
+        self.f  = f
         self.q  = q
 
         # warmup numba
@@ -78,7 +82,7 @@ class biquad:
         y = numpy.zeros(x.shape, x.dtype)
         __df1__(ba, xy, x, y, 0)
 
-    def __call__(self, x, *args, **kwargs):
+    def __call__(self, x, f=None, q=None):
         """
         Process single or multiple contiguous signal values at once.
 
@@ -86,6 +90,10 @@ class biquad:
         ----------
         x : scalar or array like
             Filter input data.
+        f : scalar or array like, optional
+            Instantaneous filter frequency parameter in hertz.
+        q : scalar or array like, optional
+            Instantaneous filter quality parameter.
 
         Returns
         -------

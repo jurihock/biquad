@@ -9,7 +9,7 @@ class highpass(biquad):
     Highpass filter (HPF).
     """
 
-    def __init__(self, sr, q=0.7071):
+    def __init__(self, sr, *, f=None, q=0.7071):
         """
         Create a new filter instance.
 
@@ -17,15 +17,17 @@ class highpass(biquad):
         ----------
         sr : int or float
             Sample rate in hertz.
+        f : int or float, optional
+            Persistent filter frequency parameter in hertz.
         q : int or float, optional
             Persistent filter quality parameter.
         """
 
-        super().__init__(sr, q)
+        super().__init__(sr=sr, f=f, q=q)
 
         self.__call__(0, 1) # warmup numba
 
-    def __call__(self, x, f, q=None):
+    def __call__(self, x, f=None, q=None):
         """
         Process single or multiple contiguous signal values at once.
 
@@ -33,10 +35,10 @@ class highpass(biquad):
         ----------
         x : scalar or array like
             Filter input data.
-        f : scalar or array like
+        f : scalar or array like, optional
             Instantaneous filter frequency parameter in hertz.
         q : scalar or array like, optional
-            Optional instantaneous filter quality parameter.
+            Instantaneous filter quality parameter.
 
         Returns
         -------
@@ -52,8 +54,8 @@ class highpass(biquad):
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape, x.dtype)
 
-        f = numpy.atleast_1d(f)
-        q = numpy.atleast_1d(q or self.q)
+        f = numpy.atleast_1d(self.f if f is None else f)
+        q = numpy.atleast_1d(self.q if q is None else q)
 
         f = numpy.resize(f, x.shape)
         q = numpy.resize(q, x.shape)
