@@ -24,7 +24,7 @@ for name in filters:
 
     fltr = biquad.filter(name, sr)
 
-    fltr(0, sr / 4)
+    fltr(0, sr/4)
 
     figure = plot.figure()
     figure.suptitle(name)

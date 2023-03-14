@@ -8,7 +8,7 @@ import numpy as np
 
 
 sr = 44100
-n  = 60 * sr
+n  = 60*sr
 
 f = biquad.biquad(sr)
 x = np.arange(n).astype(float)
