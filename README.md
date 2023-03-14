@@ -1,4 +1,4 @@
-# Alterable Biquad Filters
+# Alterable biquad filters
 
 ![language](https://img.shields.io/badge/languages-C%2B%2B%20Python-blue)
 ![license](https://img.shields.io/github/license/jurihock/biquad?color=green)
@@ -14,6 +14,46 @@ This is a collection of digital biquad filters whose parameters can be varied at
 - Lowshelf
 - Notch
 - Peak
+
+## Basic usage
+
+Filter with persistent configuration:
+
+```python
+import biquad
+import numpy as np
+
+# load audio samples somehow
+sr = 44100
+x = np.zeros(...)
+
+# create a filter of your choice
+f = biquad.bandpass(sr, f=sr/4, q=1)
+
+# process all audio samples
+y = f(x)
+```
+
+Filter with dynamic configuration:
+
+```python
+import biquad
+import numpy as np
+
+# load audio samples somehow
+sr = 44100
+x = np.zeros(...)
+
+# create a filter of your choice
+f = biquad.bandpass(sr)
+
+# create parameter modifications as you like
+myf = np.linspace(1, sr/4, len(x))
+myq = np.linspace(2,  1/2, len(x))
+
+# process all audio samples
+y = f(x, f=myf, q=myq)
+```
 
 ## See also
 
