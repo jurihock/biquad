@@ -13,7 +13,9 @@ filters = [
     'apf',
     'bpf',
     'hpf',
+    'hsf',
     'lpf',
+    'lsf',
     'notch',
     'peak',
 ]

@@ -4,9 +4,9 @@ import numba
 import numpy
 
 
-class peak(biquad):
+class highshelf(biquad):
     """
-    Peaking EQ filter.
+    Highshelf filter (HSF).
     """
 
     def __init__(self, sr, gain=6, q=1):
@@ -48,6 +48,7 @@ class peak(biquad):
     @numba.jit(nopython=True, fastmath=True)
     def __filter__(ba, xy, x, y, f, q, sr, amp):
 
+        sq = 2 * numpy.sqrt(amp)
         rs = 2 * numpy.pi / sr
 
         for i in range(x.size):
@@ -57,21 +58,20 @@ class peak(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
-            c = -(2 * cosw)
-            p = sinw / (2 * q[i])
+            p = sq * sinw / (2 * q[i])
 
-            m = p * amp
-            d = p / amp
+            pamp = amp + 1
+            namp = amp - 1
 
             # update b
-            ba[0, 0] = 1 + m
-            ba[0, 1] =     c
-            ba[0, 2] = 1 - m
+            ba[0, 0] = (pamp + namp * cosw + p) * amp
+            ba[0, 1] = (namp + pamp * cosw)     * amp * -2
+            ba[0, 2] = (pamp + namp * cosw - p) * amp
 
             # update a
-            ba[1, 0] = 1 + d
-            ba[1, 1] =     c
-            ba[1, 2] = 1 - d
+            ba[1, 0] = (pamp - namp * cosw + p)
+            ba[1, 1] = (namp - pamp * cosw)           * +2
+            ba[1, 2] = (pamp - namp * cosw - p)
 
             # update y
             __df1__(ba, xy, x, y, i)
