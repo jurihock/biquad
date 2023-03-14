@@ -10,6 +10,18 @@ class bandpass(biquad):
     """
 
     def __init__(self, sr, gain='skirt', q=0.7071):
+        """
+        Create a new filter instance.
+
+        Parameters
+        ----------
+        sr : int or float
+            Sample rate in hertz.
+        gain : str, skirt or peak, optional
+            Choice between constant skirt gain or constant 0 dB peak gain.
+        q : int or float, optional
+            Persistent filter quality parameter.
+        """
 
         super().__init__(sr, q)
 

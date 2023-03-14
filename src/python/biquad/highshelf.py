@@ -10,6 +10,18 @@ class highshelf(biquad):
     """
 
     def __init__(self, sr, gain=6, q=1):
+        """
+        Create a new filter instance.
+
+        Parameters
+        ----------
+        sr : int or float
+            Sample rate in hertz.
+        gain : int or float, optional
+            Filter peak gain value in decibel.
+        q : int or float, optional
+            Persistent filter quality parameter.
+        """
 
         super().__init__(sr, q)
 

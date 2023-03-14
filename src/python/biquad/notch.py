@@ -10,6 +10,16 @@ class notch(biquad):
     """
 
     def __init__(self, sr, q=10):
+        """
+        Create a new filter instance.
+
+        Parameters
+        ----------
+        sr : int or float
+            Sample rate in hertz.
+        q : int or float, optional
+            Persistent filter quality parameter.
+        """
 
         super().__init__(sr, q)
 

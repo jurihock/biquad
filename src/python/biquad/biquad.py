@@ -54,6 +54,16 @@ class biquad:
     """
 
     def __init__(self, sr, q=None):
+        """
+        Create a new filter instance.
+
+        Parameters
+        ----------
+        sr : int or float
+            Sample rate in hertz.
+        q : int or float, optional
+            Persistent filter quality parameter.
+        """
 
         assert (sr is not None) and (numpy.isscalar(sr) and numpy.isreal(sr))
         assert (q  is     None) or  (numpy.isscalar(q)  and numpy.isreal(q))
@@ -104,6 +114,27 @@ class biquad:
             __df1__(ba, xy, x, y, i)
 
     def response(self, norm=False, log=False):
+        """
+        Returns frequency and phase response of the transfer function given by the ba coefficients.
+
+        Parameters
+        ----------
+        norm : bool, optional
+            Option whether to normalize the output frequency response.
+        log : bool, optional
+            Option whether to express the output frequency values logarithmically.
+
+        Returns
+        -------
+        w : array
+            Corresponding frequency values.
+        h : array
+            Complex filter response values.
+
+        See also
+        --------
+            scipy.signal.freqz
+        """
 
         (b, a), sr = self.ba, self.sr
 
@@ -129,6 +160,10 @@ class biquad:
         return w, h
 
     def plot(self):
+        """
+        Returns a filter response plotting wrapper to
+        easily create the frequency or phase response plots.
+        """
 
         w, h = self.response()
 
