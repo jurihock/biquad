@@ -24,8 +24,7 @@ import biquad
 import numpy as np
 
 # load audio samples somehow
-sr = 44100
-x = np.zeros(...)
+x, sr = np.zeros(...), 44100
 
 # create a filter of your choice
 f = biquad.bandpass(sr, f=sr/4, q=1)
@@ -41,8 +40,7 @@ import biquad
 import numpy as np
 
 # load audio samples somehow
-sr = 44100
-x = np.zeros(...)
+x, sr = np.zeros(...), 44100
 
 # create a filter of your choice
 f = biquad.bandpass(sr)
