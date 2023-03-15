@@ -61,7 +61,8 @@ Keep in mind:
 
 ## References
 
-1. <span id="1">[Audio EQ Cookbook](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html) by Robert Bristow-Johnson</span>
+1. <span id="1">[Cookbook formulae for audio EQ biquad filter coefficients](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html) by Robert Bristow-Johnson</span>
+2. <span id="2">[Introduction to Digital Filters with Audio Applications](https://ccrma.stanford.edu/~jos/filters/filters.html) by Julius O. Smith III</span>
 
 ## License
 
