@@ -58,7 +58,7 @@ class biquad:
     """
     Biquad filter delay line matrix of shape (2, 3):
         - xy[0] holds input values
-        - xy[0] holds output values
+        - xy[1] holds output values
     """
 
     def __init__(self, sr, *, f=None, q=None):
@@ -178,7 +178,7 @@ class biquad:
     def plot(self):
         """
         Returns a filter response plotting wrapper to
-        easily create the frequency or phase response plots.
+        easily create frequency or phase response plots.
         """
 
         w, h = self.response()
