@@ -4,7 +4,7 @@
 ![license](https://img.shields.io/github/license/jurihock/biquad?color=green)
 ![pypi](https://img.shields.io/pypi/v/biquad?color=gold)
 
-This is a collection of digital biquad filters whose parameters `f` (frequency) and `q` (quality) can be varied at runtime. Following filter implementations are available:
+This is a collection of [digital biquad filters](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html) whose parameters `f` (frequency) and `q` (quality) can be varied at runtime. Following [DF1](https://ccrma.stanford.edu/~jos/fp/Direct_Form_I.html) filter implementations are available:
 
 - Allpass
 - Bandpass
@@ -59,6 +59,11 @@ Keep in mind:
 - Parameter `f` must be set either in the `__init__` or in the `__call__` method.
 - The optional instantaneous parameters `f` and `q`, if specified in the `__call__` method, override the persistent ones. 
 
-## See also
+## References
 
-[Cookbook formulae for audio equalizer biquad filter coefficients](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html)
+1. <span id="1">[Audio EQ Cookbook](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html) by Robert Bristow-Johnson</span>
+
+## License
+
+[github.com/jurihock/biquad](https://github.com/jurihock/biquad) is licensed under the terms of the MIT license.
+For details please refer to the accompanying [LICENSE](https://github.com/jurihock/biquad/raw/main/LICENSE) file distributed with it.
