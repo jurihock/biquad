@@ -55,9 +55,9 @@ y = f(x, f=myf, q=myq)
 
 Keep in mind:
 
-- All filters have a default value for the persistent parameter `q`, which is set in the particular `__init__` method.
+- All filters have a default value for the persistent parameters `g` and `q`, which is set in the particular `__init__` method.
 - Parameter `f` must be set either in the `__init__` or in the `__call__` method.
-- The optional instantaneous parameters `f` and `q`, if specified in the `__call__` method, override the persistent ones. 
+- The optional instantaneous parameters `f`, `g` and `q`, if specified in the `__call__` method, override the persistent ones. 
 
 ## References
 
