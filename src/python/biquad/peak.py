@@ -97,19 +97,17 @@ class peak(biquad):
 
             alpha = sinw / (+2 * q[i])
             beta  = cosw * (-2)
-
-            mul = alpha * g[i]
-            div = alpha / g[i]
+            gamma = 1 / g[i]
 
             # update b
-            ba[0, 0] = 1 + mul
-            ba[0, 1] =     beta
-            ba[0, 2] = 1 - mul
+            ba[0, 0] = 1 + alpha
+            ba[0, 1] =     beta  * gamma
+            ba[0, 2] = 1 - alpha
 
             # update a
-            ba[1, 0] = 1 + div
+            ba[1, 0] = 1 + alpha * gamma
             ba[1, 1] =     beta
-            ba[1, 2] = 1 - div
+            ba[1, 2] = 1 - alpha * gamma
 
             # update y
-            __df1__(1, ba, xy, x, y, i)
+            __df1__(g[i], ba, xy, x, y, i)

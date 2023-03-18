@@ -10,7 +10,9 @@ def test(name):
 
     sr = 44100
 
-    f = biquad.filter(name, sr, f=sr/4)
+    args = dict(f=sr/4)
+
+    f = biquad.filter(name, sr, **args)
 
     figure = plot.figure()
     figure.suptitle(name)
