@@ -89,8 +89,8 @@ class lowpass(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
-            c = -(2 * cosw)
-            p = sinw / (2 * q[i])
+            alpha = sinw / (+2 * q[i])
+            beta  = cosw * (-2)
 
             # update b
             ba[0, 1] = +(1 - cosw)
@@ -98,9 +98,9 @@ class lowpass(biquad):
             ba[0, 0] = ba[0, 2]
 
             # update a
-            ba[1, 0] = 1 + p
-            ba[1, 1] =     c
-            ba[1, 2] = 1 - p
+            ba[1, 0] = 1 + alpha
+            ba[1, 1] =     beta
+            ba[1, 2] = 1 - alpha
 
             # update y
             __df1__(g[i], ba, xy, x, y, i)

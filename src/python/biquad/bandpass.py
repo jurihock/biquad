@@ -97,19 +97,20 @@ class bandpass(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
-            c = -(2 * cosw)
-            p = sinw / (2 * q[i])
-            s = sinw / 2 if skirt else p
+            alpha = sinw / (+2 * q[i])
+            beta  = cosw * (-2)
+
+            gamma = sinw / 2 if skirt else alpha
 
             # update b
-            ba[0, 0] = +s
+            ba[0, 0] = +gamma
             ba[0, 1] =  0
-            ba[0, 2] = -s
+            ba[0, 2] = -gamma
 
             # update a
-            ba[1, 0] = 1 + p
-            ba[1, 1] =     c
-            ba[1, 2] = 1 - p
+            ba[1, 0] = 1 + alpha
+            ba[1, 1] =     beta
+            ba[1, 2] = 1 - alpha
 
             # update y
             __df1__(g[i], ba, xy, x, y, i)

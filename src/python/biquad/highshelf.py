@@ -91,21 +91,21 @@ class highshelf(biquad):
             cosw = numpy.cos(w)
             sinw = numpy.sin(w)
 
-            p = sinw / (2 * q[i])
-            p *= 2 * numpy.sqrt(g[i])
+            alpha = sinw / (2 * q[i])
+            alpha *= 2 * numpy.sqrt(g[i])
 
-            pamp = g[i] + 1
-            namp = g[i] - 1
+            plus  = g[i] + 1
+            minus = g[i] - 1
 
             # update b
-            ba[0, 0] = (pamp + namp * cosw + p)
-            ba[0, 1] = (namp + pamp * cosw)     * -2
-            ba[0, 2] = (pamp + namp * cosw - p)
+            ba[0, 0] = (plus  + minus * cosw + alpha)
+            ba[0, 1] = (minus + plus  * cosw) * -2
+            ba[0, 2] = (plus  + minus * cosw - alpha)
 
             # update a
-            ba[1, 0] = (pamp - namp * cosw + p)
-            ba[1, 1] = (namp - pamp * cosw)     * +2
-            ba[1, 2] = (pamp - namp * cosw - p)
+            ba[1, 0] = (plus  - minus * cosw + alpha)
+            ba[1, 1] = (minus - plus  * cosw) * +2
+            ba[1, 2] = (plus  - minus * cosw - alpha)
 
             # update y
             __df1__(g[i], ba, xy, x, y, i)
