@@ -6,8 +6,6 @@ SPDX-License-Identifier: MIT
 Source: https://github.com/jurihock/biquad
 """
 
-from .plot import plot
-
 import numba
 import numpy
 
@@ -221,12 +219,46 @@ class biquad:
 
         return w, h
 
-    def plot(self):
+    def plot(self, *, log=False):
         """
-        Returns a filter response plotting wrapper to
-        easily create frequency or phase response plots.
+        Creates filter frequency and phase response plot.
+
+        Parameters
+        ----------
+        log : bool, optional
+            Option whether to express frequency values logarithmically.
         """
+
+        import matplotlib.pyplot as pyplot
 
         w, h = self.response()
 
-        return plot(w, h)
+        with numpy.errstate(divide='ignore', invalid='ignore'):
+            habs = 20 * numpy.log10(numpy.abs(h))
+
+        harg = numpy.angle(h)
+
+        pyplot.plot(w, habs, color='b', alpha=0.9)
+        axis1 = pyplot.gca()
+        axis2 = axis1.twinx()
+        axis2.plot(w, harg, color='g', alpha=0.9)
+
+        axis1.set_xlabel('Hz')
+        axis1.set_ylabel('dB',  color='b')
+        axis2.set_ylabel('rad', color='g')
+
+        habsmin = numpy.min(habs[numpy.isfinite(habs)])
+        habsmax = numpy.max(habs[numpy.isfinite(habs)])
+
+        habsmin = numpy.minimum(habsmin, -100)
+        habsmax = numpy.maximum(habsmax, +10)
+
+        hargmin = -numpy.pi
+        hargmax = +numpy.pi
+
+        axis1.set_ylim((habsmin * 1.1, habsmax * 1.1))
+        axis2.set_ylim((hargmin * 1.1, hargmax * 1.1))
+
+        if log: axis1.set_xscale('log')
+
+        return pyplot

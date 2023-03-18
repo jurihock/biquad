@@ -15,11 +15,7 @@ def test(name):
     figure = plot.figure()
     figure.suptitle(name)
 
-    plot.subplot(1, 2, 1)
-    f.plot().frequency()
-
-    plot.subplot(1, 2, 2)
-    f.plot().phase()
+    f.plot()
 
     plot.tight_layout()
     plot.show()
