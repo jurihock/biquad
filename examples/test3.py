@@ -39,12 +39,28 @@ def test(name):
     sr = 44100
     n  = 1*sr
 
-    f = biquad.filter(name, sr, f=sr/4, g=12)
+    args = dict(f=sr/4, g=12)
+
+    f = biquad.filter(name, sr, **args)
+
+    ff = f.f
+    fg = f.g
+    fq = f.q
+
+    f(0, **args)
+
+    assert f.f == ff
+    assert f.g == fg
+    assert f.q == fq
 
     x = noise(n)
 
-    with benchmark.measure():
+    with benchmark.measure(f'{name}\t'):
         y = f(x)
+
+    assert f.f == ff
+    assert f.g == fg
+    assert f.q == fq
 
     wx, hx = fft(x, sr)
     wy, hy = fft(y, sr)
