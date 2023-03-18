@@ -116,9 +116,9 @@ class biquad:
         assert (q  is     None) or  (numpy.isscalar(q)  and numpy.isreal(q))
 
         self.sr = sr
-        self.f  = f
-        self.g  = __gain__(g or 0)
-        self.q  = q
+        self.f  = (sr / 4) if f is None else f
+        self.g  = __gain__(0 if g is None else g)
+        self.q  = 1 if q is None else q
 
         # warmup numba
         g  = self.g

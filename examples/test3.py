@@ -39,9 +39,11 @@ def test(name):
     sr = 44100
     n  = 1*sr
 
-    args = dict(f=sr/4, g=12)
+    args = dict(g=12)
 
     f = biquad.filter(name, sr, **args)
+
+    assert f.f == sr / 4
 
     ff = f.f
     fg = f.g

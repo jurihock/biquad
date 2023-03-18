@@ -37,7 +37,7 @@ class peak(biquad):
 
         self.g = __gain__(g, 40)
 
-        self.__call__(0, f or 1) # warmup numba
+        self.__call__(0) # warmup numba
 
     def __call__(self, x, f=None, g=None, q=None):
         """
