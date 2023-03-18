@@ -4,7 +4,7 @@
 ![license](https://img.shields.io/github/license/jurihock/biquad?color=green)
 ![pypi](https://img.shields.io/pypi/v/biquad?color=gold)
 
-This is a collection of [digital biquad filters](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html) whose parameters `f` (frequency), `g` (gain) and `q` (quality) can be varied at runtime. Following [DF1](https://ccrma.stanford.edu/~jos/fp/Direct_Form_I.html) filter implementations are available:
+This is a collection of [digital biquad filters](https://webaudio.github.io/Audio-EQ-Cookbook/audio-eq-cookbook.html) whose parameters `f` (frequency in *Hz*), `g` (gain in *dB*) and `q` (quality) can be varied at runtime. Following [DF1](https://ccrma.stanford.edu/~jos/fp/Direct_Form_I.html) filter implementations are available:
 
 - Allpass
 - Bandpass
