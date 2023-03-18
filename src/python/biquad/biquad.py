@@ -157,9 +157,15 @@ class biquad:
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape, x.dtype)
 
+        f = __resize__(self.f if f is None else f, x.shape)
         g = __resize__(self.g if g is None else __gain__(g), x.shape)
+        q = __resize__(self.q if q is None else q, x.shape)
 
         self.__filter__(ba, xy, x, y, g)
+
+        self.f = f[-1]
+        self.g = g[-1]
+        self.q = q[-1]
 
         return y[0] if scalar else y
 

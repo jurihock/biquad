@@ -81,6 +81,10 @@ class bandpass(biquad):
 
         self.__filter__(ba, xy, x, y, f, g, q, sr, mode)
 
+        self.f = f[-1]
+        self.g = g[-1]
+        self.q = q[-1]
+
         return y[0] if scalar else y
 
     @staticmethod
