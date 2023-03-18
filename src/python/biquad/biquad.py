@@ -15,7 +15,7 @@ import numpy
 @numba.jit(nopython=True, fastmath=True)
 def __df1__(g, ba, xy, x, y, i):
     """
-    Computes filter output y[i] based on filter input x[i]
+    Compute filter output y[i] based on filter input x[i]
     as well as specified filter gain g, coeffs ba and delay line xy,
     according to the Direct Form 1.
     """
@@ -43,6 +43,9 @@ def __df1__(g, ba, xy, x, y, i):
 
 
 def __gain__(x, divisor=20):
+    """
+    Convert the specified decibel gain to the linear gain.
+    """
 
     if numpy.isscalar(x):
 
@@ -58,6 +61,9 @@ def __gain__(x, divisor=20):
 
 
 def __resize__(x, shape):
+    """
+    Resize the specified value to the ndarray of desired shape.
+    """
 
     if numpy.isscalar(x):
 
