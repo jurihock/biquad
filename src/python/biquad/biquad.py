@@ -13,10 +13,10 @@ import numpy
 
 
 @numba.jit(nopython=True, fastmath=True)
-def __df1__(ba, xy, x, y, i):
+def __df1__(g, ba, xy, x, y, i):
     """
     Computes filter output y[i] based on filter input x[i]
-    as well as specified filter coeffs ba and delay line xy,
+    as well as specified filter gain g, coeffs ba and delay line xy,
     according to the Direct Form 1.
     """
 
@@ -31,15 +31,44 @@ def __df1__(ba, xy, x, y, i):
     # update x
     xy[0, 0] = x[i]
 
+    # compute intermediate results b*x and a*y
+    bx = ba[0, 0] * xy[0, 0] + ba[0, 1] * xy[0, 1] + ba[0, 2] * xy[0, 2]
+    ay =                       ba[1, 1] * xy[1, 1] + ba[1, 2] * xy[1, 2]
+
     # update y
-    xy[1, 0] = (ba[0, 0] * xy[0, 0]  + \
-                ba[0, 1] * xy[0, 1]  + \
-                ba[0, 2] * xy[0, 2]  - \
-                ba[1, 1] * xy[1, 1]  - \
-                ba[1, 2] * xy[1, 2]) / ba[1, 0]
+    xy[1, 0] = (bx * g - ay) / ba[1, 0]
 
     # return y
     y[i] = xy[1, 0]
+
+
+def __gain__(x, divisor=20):
+
+    if numpy.isscalar(x):
+
+        y = x / divisor
+        y = 10 ** y
+
+    else:
+
+        y = numpy.atleast_1d(x) / divisor
+        numpy.power(10, y, out=y)
+
+    return y
+
+
+def __resize__(x, shape):
+
+    if numpy.isscalar(x):
+
+        y = numpy.full(shape, x)
+
+    else:
+
+        x = numpy.atleast_1d(x)
+        y = numpy.resize(x, shape)
+
+    return y
 
 
 class biquad:
@@ -49,7 +78,7 @@ class biquad:
 
     ba = numpy.array([[1, 0, 0], [1, 0, 0]], float)
     """
-    Biquad filter coefficient matrix of shape (2, 3):
+    Biquad filter coefficient matrix of shape (2, 3) excl. gain factor:
         - ba[0] holds b coefficients
         - ba[1] holds a coefficients
     """
@@ -61,7 +90,7 @@ class biquad:
         - xy[1] holds output values
     """
 
-    def __init__(self, sr, *, f=None, q=None):
+    def __init__(self, sr, f=None, g=None, q=None):
         """
         Create a new filter instance.
 
@@ -71,26 +100,31 @@ class biquad:
             Sample rate in hertz.
         f : int or float, optional
             Persistent filter frequency parameter in hertz.
+        g : int or float, optional
+            Persistent filter gain parameter in decibel.
         q : int or float, optional
             Persistent filter quality parameter.
         """
 
         assert (sr is not None) and (numpy.isscalar(sr) and numpy.isreal(sr))
         assert (f  is     None) or  (numpy.isscalar(f)  and numpy.isreal(f))
+        assert (g  is     None) or  (numpy.isscalar(g)  and numpy.isreal(g))
         assert (q  is     None) or  (numpy.isscalar(q)  and numpy.isreal(q))
 
         self.sr = sr
         self.f  = f
+        self.g  = __gain__(g or 0)
         self.q  = q
 
         # warmup numba
+        g  = self.g
         ba = self.ba
         xy = self.xy
-        x = numpy.zeros(1, float)
-        y = numpy.zeros(x.shape, x.dtype)
-        __df1__(ba, xy, x, y, 0)
+        x  = numpy.zeros(1, float)
+        y  = numpy.zeros(x.shape, x.dtype)
+        __df1__(g, ba, xy, x, y, 0)
 
-    def __call__(self, x, f=None, q=None):
+    def __call__(self, x, f=None, g=None, q=None):
         """
         Process single or multiple contiguous signal values at once.
 
@@ -100,6 +134,8 @@ class biquad:
             Filter input data.
         f : scalar or array like, optional
             Instantaneous filter frequency parameter in hertz.
+        g : scalar or array like, optional
+            Instantaneous filter gain parameter in decibel.
         q : scalar or array like, optional
             Instantaneous filter quality parameter.
 
@@ -117,19 +153,21 @@ class biquad:
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape, x.dtype)
 
-        self.__filter__(ba, xy, x, y)
+        g = __resize__(self.g if g is None else __gain__(g), x.shape)
+
+        self.__filter__(ba, xy, x, y, g)
 
         return y[0] if scalar else y
 
     @staticmethod
     @numba.jit(nopython=True, fastmath=True)
-    def __filter__(ba, xy, x, y):
+    def __filter__(ba, xy, x, y, g):
 
         for i in range(x.size):
 
-            __df1__(ba, xy, x, y, i)
+            __df1__(g[i], ba, xy, x, y, i)
 
-    def response(self, norm=False, log=False):
+    def response(self, *, norm=False, log=False):
         """
         Returns frequency and phase response of the transfer function given by the ba coefficients.
 
@@ -153,6 +191,8 @@ class biquad:
         """
 
         (b, a), sr = self.ba, self.sr
+
+        b *= self.g
 
         n = int(sr / 2)
 

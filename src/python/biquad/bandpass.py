@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 Source: https://github.com/jurihock/biquad
 """
 
-from .biquad import biquad, __df1__
+from .biquad import biquad, __df1__, __gain__, __resize__
 
 import numba
 import numpy
@@ -17,7 +17,7 @@ class bandpass(biquad):
     Bandpass filter (BPF).
     """
 
-    def __init__(self, sr, gain='skirt', *, f=None, q=0.7071):
+    def __init__(self, sr, f=None, g=0, q=0.7071, *, mode='peak'):
         """
         Create a new filter instance.
 
@@ -25,23 +25,25 @@ class bandpass(biquad):
         ----------
         sr : int or float
             Sample rate in hertz.
-        gain : str, skirt or peak, optional
-            Choice between constant skirt gain or constant 0 dB peak gain.
         f : int or float, optional
             Persistent filter frequency parameter in hertz.
+        g : int or float, optional
+            Persistent filter gain parameter in decibel.
         q : int or float, optional
             Persistent filter quality parameter.
+        mode : str, peak or skirt, optional
+            Choice between constant 0 dB peak gain or constant skirt gain.
         """
 
-        super().__init__(sr=sr, f=f, q=q)
+        super().__init__(sr=sr, f=f, g=g, q=q)
 
-        assert gain in ['skirt', 'peak']
+        assert mode in ['skirt', 'peak']
 
-        self.gain = gain
+        self.mode = mode
 
-        self.__call__(0, 1) # warmup numba
+        self.__call__(0, f or 1) # warmup numba
 
-    def __call__(self, x, f=None, q=None):
+    def __call__(self, x, f=None, g=None, q=None):
         """
         Process single or multiple contiguous signal values at once.
 
@@ -51,6 +53,8 @@ class bandpass(biquad):
             Filter input data.
         f : scalar or array like, optional
             Instantaneous filter frequency parameter in hertz.
+        g : scalar or array like, optional
+            Instantaneous filter gain parameter in decibel.
         q : scalar or array like, optional
             Instantaneous filter quality parameter.
 
@@ -68,25 +72,23 @@ class bandpass(biquad):
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape, x.dtype)
 
-        f = numpy.atleast_1d(self.f if f is None else f)
-        q = numpy.atleast_1d(self.q if q is None else q)
-
-        f = numpy.resize(f, x.shape)
-        q = numpy.resize(q, x.shape)
+        f = __resize__(self.f if f is None else f, x.shape)
+        g = __resize__(self.g if g is None else __gain__(g), x.shape)
+        q = __resize__(self.q if q is None else q, x.shape)
 
         sr = self.sr
-        gain = self.gain
+        mode = self.mode
 
-        self.__filter__(ba, xy, x, y, f, q, sr, gain)
+        self.__filter__(ba, xy, x, y, f, g, q, sr, mode)
 
         return y[0] if scalar else y
 
     @staticmethod
     @numba.jit(nopython=True, fastmath=True)
-    def __filter__(ba, xy, x, y, f, q, sr, gain):
+    def __filter__(ba, xy, x, y, f, g, q, sr, mode):
 
         rs = 2 * numpy.pi / sr
-        skirt = gain == 'skirt'
+        skirt = mode == 'skirt'
 
         for i in range(x.size):
 
@@ -97,12 +99,12 @@ class bandpass(biquad):
 
             c = -(2 * cosw)
             p = sinw / (2 * q[i])
-            g = sinw / 2 if skirt else p
+            s = sinw / 2 if skirt else p
 
             # update b
-            ba[0, 0] = +g
+            ba[0, 0] = +s
             ba[0, 1] =  0
-            ba[0, 2] = -g
+            ba[0, 2] = -s
 
             # update a
             ba[1, 0] = 1 + p
@@ -110,4 +112,4 @@ class bandpass(biquad):
             ba[1, 2] = 1 - p
 
             # update y
-            __df1__(ba, xy, x, y, i)
+            __df1__(g[i], ba, xy, x, y, i)

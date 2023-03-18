@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 Source: https://github.com/jurihock/biquad
 """
 
-from .biquad import biquad, __df1__
+from .biquad import biquad, __df1__, __gain__, __resize__
 
 import numba
 import numpy
@@ -17,7 +17,7 @@ class peak(biquad):
     Peaking EQ filter.
     """
 
-    def __init__(self, sr, gain=6, *, f=None, q=1):
+    def __init__(self, sr, f=None, g=6, q=1):
         """
         Create a new filter instance.
 
@@ -25,22 +25,21 @@ class peak(biquad):
         ----------
         sr : int or float
             Sample rate in hertz.
-        gain : int or float, optional
-            Filter peak gain value in decibel.
         f : int or float, optional
             Persistent filter frequency parameter in hertz.
+        g : int or float, optional
+            Persistent filter gain parameter in decibel.
         q : int or float, optional
             Persistent filter quality parameter.
         """
 
-        super().__init__(sr=sr, f=f, q=q)
+        super().__init__(sr=sr, f=f, g=g, q=q)
 
-        self.gain = gain
-        self.amp = 10 ** (gain / 40)
+        self.g = __gain__(g, 40)
 
-        self.__call__(0, 1) # warmup numba
+        self.__call__(0, f or 1) # warmup numba
 
-    def __call__(self, x, f=None, q=None):
+    def __call__(self, x, f=None, g=None, q=None):
         """
         Process single or multiple contiguous signal values at once.
 
@@ -50,6 +49,8 @@ class peak(biquad):
             Filter input data.
         f : scalar or array like, optional
             Instantaneous filter frequency parameter in hertz.
+        g : scalar or array like, optional
+            Instantaneous filter gain parameter in decibel.
         q : scalar or array like, optional
             Instantaneous filter quality parameter.
 
@@ -67,22 +68,19 @@ class peak(biquad):
         x = numpy.atleast_1d(x)
         y = numpy.zeros(x.shape, x.dtype)
 
-        f = numpy.atleast_1d(self.f if f is None else f)
-        q = numpy.atleast_1d(self.q if q is None else q)
-
-        f = numpy.resize(f, x.shape)
-        q = numpy.resize(q, x.shape)
+        f = __resize__(self.f if f is None else f, x.shape)
+        g = __resize__(self.g if g is None else __gain__(g, 40), x.shape)
+        q = __resize__(self.q if q is None else q, x.shape)
 
         sr = self.sr
-        amp = self.amp
 
-        self.__filter__(ba, xy, x, y, f, q, sr, amp)
+        self.__filter__(ba, xy, x, y, f, g, q, sr)
 
         return y[0] if scalar else y
 
     @staticmethod
     @numba.jit(nopython=True, fastmath=True)
-    def __filter__(ba, xy, x, y, f, q, sr, amp):
+    def __filter__(ba, xy, x, y, f, g, q, sr):
 
         rs = 2 * numpy.pi / sr
 
@@ -96,8 +94,8 @@ class peak(biquad):
             c = -(2 * cosw)
             p = sinw / (2 * q[i])
 
-            m = p * amp
-            d = p / amp
+            m = p * g[i]
+            d = p / g[i]
 
             # update b
             ba[0, 0] = 1 + m
@@ -110,4 +108,4 @@ class peak(biquad):
             ba[1, 2] = 1 - d
 
             # update y
-            __df1__(ba, xy, x, y, i)
+            __df1__(1, ba, xy, x, y, i)
