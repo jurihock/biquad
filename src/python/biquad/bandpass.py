@@ -37,7 +37,7 @@ class bandpass(biquad):
 
         super().__init__(sr=sr, f=f, g=g, q=q)
 
-        assert mode in ['skirt', 'peak']
+        assert mode in ['peak', 'skirt']
 
         self.mode = mode
 
@@ -99,8 +99,7 @@ class bandpass(biquad):
 
             alpha = sinw / (+2 * q[i])
             beta  = cosw * (-2)
-
-            gamma = sinw / 2 if skirt else alpha
+            gamma = sinw / (+2) if skirt else alpha
 
             # update b
             ba[0, 0] = +gamma
