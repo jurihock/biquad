@@ -100,9 +100,9 @@ class peak(biquad):
             gamma = 1 / g[i]
 
             # update b
-            ba[0, 0] = 1 + alpha
-            ba[0, 1] =     beta  * gamma
-            ba[0, 2] = 1 - alpha
+            ba[0, 0] = gamma + alpha
+            ba[0, 1] = gamma * beta
+            ba[0, 2] = gamma - alpha
 
             # update a
             ba[1, 0] = 1 + alpha * gamma
