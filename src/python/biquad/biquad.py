@@ -78,20 +78,15 @@ def __resize__(x, shape):
 class biquad:
     """
     Biquad filter base class.
-    """
 
-    ba = numpy.array([[1, 0, 0], [1, 0, 0]], float)
-    """
-    Biquad filter coefficient matrix of shape (2, 3) excl. gain factor:
-        - ba[0] holds b coefficients
-        - ba[1] holds a coefficients
-    """
-
-    xy = numpy.array([[0, 0, 0], [0, 0, 0]], float)
-    """
-    Biquad filter delay line matrix of shape (2, 3):
-        - xy[0] holds input values
-        - xy[1] holds output values
+    Parameters
+    ----------
+    ba : Biquad filter coefficient matrix of shape (2, 3) excl. gain factor:
+         - ba[0] holds b coefficients
+         - ba[1] holds a coefficients
+    xy : Biquad filter delay line matrix of shape (2, 3):
+         - xy[0] holds input values
+         - xy[1] holds output values
     """
 
     def __init__(self, sr, f=None, g=None, q=None):
@@ -119,6 +114,9 @@ class biquad:
         self.f  = (sr / 4) if f is None else f
         self.g  = __gain__(0 if g is None else g)
         self.q  = 1 if q is None else q
+
+        self.ba = numpy.array([[1, 0, 0], [1, 0, 0]], float)
+        self.xy = numpy.array([[0, 0, 0], [0, 0, 0]], float)
 
         # warmup numba
         g  = self.g
